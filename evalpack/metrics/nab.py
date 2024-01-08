@@ -84,6 +84,23 @@ def scaled_sigmoid(y, Atp, Afp, c=5, implemented_version=True):
         coef = Atp - Afp
     return coef * (1 / (1 + np.exp(c * y))) - 1
 
+def get_anomalous_areas(y, pos_label=1):
+    if y[0] == pos_label:
+        first_bool = True
+    else:
+        first_bool = False
+    changepoints = np.arange(0, len(y))[[first_bool, *(np.diff(y) != 0)]]
+    if len(changepoints) % 2:
+        changepoints = np.concatenate([changepoints, [len(y)]])
+    summary_anomalous_areas = np.zeros((len(changepoints) // 2, 3))
+    for i_anomaly in range(summary_anomalous_areas.shape[0]):
+        summary_anomalous_areas[i_anomaly, 0] = changepoints[2 * i_anomaly]
+        summary_anomalous_areas[i_anomaly, 1] = changepoints[2 * i_anomaly + 1]
+        summary_anomalous_areas[i_anomaly, 2] = (
+            changepoints[2 * i_anomaly + 1] - changepoints[2 * i_anomaly]
+        )
+
+    return summary_anomalous_areas
 
 def isin_area(pos, summary):
     if pos >= summary[0] and pos < summary[1]:
@@ -151,7 +168,7 @@ def nab_score(
     implemented_version=True,
     return_sum=True,
 ):
-    summary_anomalous_areas = utils.get_anomalous_areas(y_true, pos_label=pos_label)
+    summary_anomalous_areas = get_anomalous_areas(y_true, pos_label=pos_label)
     tp_fn_score = -np.ones(summary_anomalous_areas.shape[0])
     raw_fp_score = 0
     for i_pred, pred in enumerate(y_pred):

@@ -138,5 +138,5 @@ def produce_all_results():
 def affiliation_f1_score(y_true, y_pred, pos_label):
     event_labels = utils.get_contiguous_region(y_true)[pos_label]
     event_pred = utils.get_contiguous_region(y_pred)[pos_label]
-    res = affiliation_utils.pr_from_events(event_pred, event_labels, (0, y_true.size))
+    res = pr_from_events(event_pred, event_labels, (0, y_true.size))
     return affiliation_utils.f1_func(res["precision"], res["recall"])

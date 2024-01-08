@@ -3,7 +3,7 @@ import pandas as pd
 import copy
 
 
-def get_contiguous_region(vals, labels=[-1, 1]):
+def get_contiguous_region(vals, labels=[0, 1]):
     changes_index = np.where(vals[:-1] != vals[1:])[0]
     regions = {label: list() for label in labels}
     if len(changes_index):
